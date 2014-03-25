@@ -6,6 +6,8 @@
 //  Copyright (c) 2014年 邱扬. All rights reserved.
 //
 
+#warning 需要添加接收消息recv
+
 #import "HYMainViewController.h"
 
 @interface HYMainViewController ()
@@ -32,7 +34,7 @@
     _mainTableView.allowsSelection = NO;
     _mainTableView.backgroundView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"bg"]];
     
-    //演示效果   初始化信息
+#warning //演示效果   初始化信息
     NSArray *array = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"temMessage" ofType:@"plist"]];
     
     _allMainMessage = [NSMutableArray array];
@@ -114,6 +116,10 @@
     
     //将text清空
     _messageText.text = nil;
+    
+    
+#warning  需要添加网络send  发送消息
+    
     return YES;
 }
 
