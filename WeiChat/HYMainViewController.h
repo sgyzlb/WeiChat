@@ -7,12 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "HYMessageTableViewCell.h"
 
 @interface HYMainViewController : UIViewController<UITableViewDelegate, UITextFieldDelegate>
+
+@property (nonatomic, strong) NSMutableArray *allMainMessage;
 
 @property (weak, nonatomic) IBOutlet UIButton *speakBtn;
 @property (weak, nonatomic) IBOutlet UITextField *messageText;
 @property (weak, nonatomic) IBOutlet UITableView *mainTableView;
 - (IBAction)speakMessage:(id)sender;
+- (IBAction)imgMessage:(id)sender;
+- (IBAction)addMessage:(id)sender;
+
+
+@property (weak, nonatomic) IBOutlet UIView *bottomView;
 
 @end

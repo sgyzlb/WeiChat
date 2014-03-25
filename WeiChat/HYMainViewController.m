@@ -32,6 +32,28 @@
     _mainTableView.allowsSelection = NO;
     _mainTableView.backgroundView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"bg"]];
     
+    //演示效果   初始化信息
+    NSArray *array = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"temMessage" ofType:@"plist"]];
+    
+    _allMainMessage = [NSMutableArray array];
+    NSString *previousTime = nil;
+    for (NSDictionary *dict in array) {
+        
+        HYMainMessage *messageFrame = [[HYMainMessage alloc] init];
+        HYMessage *message = [[HYMessage alloc] init];
+        message.dict = dict;
+        
+        messageFrame.showTime = ![previousTime isEqualToString:message.time];
+        
+        messageFrame.message = message;
+        
+        previousTime = message.time;
+        
+        [_allMainMessage addObject:messageFrame];
+    }
+    
+    
+    
     _messageText.delegate = self;
     //设置textField输入起始位置
     _messageText.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 10, 0)];
@@ -40,6 +62,13 @@
     //设置通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - 键盘处理
@@ -50,6 +79,7 @@
     CGFloat ty = - rect.size.height;
     [UIView animateWithDuration:[note.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue] animations:^{
         self.view.transform = CGAffineTransformMakeTranslation(0, ty);
+        self.mainTableView.frame = CGRectMake(0, 0, 320, 520 - rect.size.height);
     }];
     
 }
@@ -58,30 +88,53 @@
     
     [UIView animateWithDuration:[note.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue] animations:^{
         self.view.transform = CGAffineTransformIdentity;
+        self.mainTableView.frame = CGRectMake(0, 0, 320, 520);
     }];
 }
 
 #pragma mark - 文本框代理方法
 #pragma mark 点击textField键盘的回车按钮
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    //获取数据
+    NSString *tempText = _messageText.text;
+    if ([tempText isEqualToString:@""]) {
+        return NO;
+    }
+    //获取当前时间
+    NSDateFormatter *tempFormatTime = [[NSDateFormatter alloc] init];
+    tempFormatTime.dateFormat = @"MM-dd";
+    NSString *tempTime = [tempFormatTime stringFromDate:[NSDate date]];
+    //增加数据
+    [self addMessage:tempText time:tempTime];
+    //刷新table
+    [self.mainTableView reloadData];
+    //滚动table
+    NSIndexPath *index = [NSIndexPath indexPathForRow:_allMainMessage.count - 1 inSection:0];
+    [self.mainTableView scrollToRowAtIndexPath:index atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    
+    //将text清空
     _messageText.text = nil;
     return YES;
 }
 
-#pragma mark - 代理方法
+- (void)addMessage:(NSString *)text time:(NSString *)time {
+    HYMainMessage *addMainMessage = [[HYMainMessage alloc] init];
+    HYMessage *addMessage = [[HYMessage alloc] init];
+    addMessage.text = text;
+    addMessage.time = time;
+    addMessage.type = MessageForMe;
+    addMessage.icon = @"head1";
+    addMainMessage.message = addMessage;
+    
+    [_allMainMessage addObject:addMainMessage];
+}
 
-//当你下滑后  手指离开view的那一刻
-//收回键盘
+#pragma mark - 代理方法  //当你下滑后  手指离开view的那一刻 //收回键盘
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
     [self.view endEditing:YES];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
+#pragma mark //按住说话
 - (IBAction)speakMessage:(id)sender {
     if (_messageText.hidden == YES) {
         _messageText.hidden = NO;
@@ -98,17 +151,44 @@
         //收回键盘
         [_messageText resignFirstResponder];
     }
+    
+    
+    
+#warning 这里添加语音接口  按住可以说话
+    
+}
+
+- (IBAction)imgMessage:(id)sender {
+#warning 这里添加弹出图像键盘
+}
+
+- (IBAction)addMessage:(id)sender {
+#warning 添加附加键盘：照片，照相 ，地点等。
 }
 
 
 #pragma mark -- tableview
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 0;
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return _allMainMessage.count;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 0;
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    return [_allMainMessage[indexPath.row] cellHeight];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *chatCellIdentifier = @"chatcellidentifier";
+    HYMessageTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:chatCellIdentifier];
+    
+    if (cell == nil) {
+        cell = [[HYMessageTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:chatCellIdentifier];
+    }
+    
+    cell.mainMessage = _allMainMessage[indexPath.row];
+    
+    return cell;
 }
 
 @end

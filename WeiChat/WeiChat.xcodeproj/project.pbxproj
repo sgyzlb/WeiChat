@@ -21,6 +21,10 @@
 		D08CAEF918E05FFA00EE7193 /* WeiChatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D08CAEF818E05FFA00EE7193 /* WeiChatTests.m */; };
 		D08CAF1718E067FA00EE7193 /* HYMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D08CAF1518E067FA00EE7193 /* HYMainViewController.m */; };
 		D08CAF1818E067FA00EE7193 /* HYMainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08CAF1618E067FA00EE7193 /* HYMainViewController.xib */; };
+		D0C180A618E1138D003A5717 /* HYMessageTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C180A418E1138D003A5717 /* HYMessageTableViewCell.m */; };
+		D0C180A718E1138D003A5717 /* HYMessageTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0C180A518E1138D003A5717 /* HYMessageTableViewCell.xib */; };
+		D0C180AC18E113CB003A5717 /* HYMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C180AB18E113CB003A5717 /* HYMessage.m */; };
+		D0C180B018E1588F003A5717 /* temMessage.plist in Resources */ = {isa = PBXBuildFile; fileRef = D0C180AF18E1588F003A5717 /* temMessage.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +57,12 @@
 		D08CAF1418E067FA00EE7193 /* HYMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HYMainViewController.h; sourceTree = "<group>"; };
 		D08CAF1518E067FA00EE7193 /* HYMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HYMainViewController.m; sourceTree = "<group>"; };
 		D08CAF1618E067FA00EE7193 /* HYMainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HYMainViewController.xib; sourceTree = "<group>"; };
+		D0C180A318E1138D003A5717 /* HYMessageTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HYMessageTableViewCell.h; sourceTree = "<group>"; };
+		D0C180A418E1138D003A5717 /* HYMessageTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HYMessageTableViewCell.m; sourceTree = "<group>"; };
+		D0C180A518E1138D003A5717 /* HYMessageTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HYMessageTableViewCell.xib; sourceTree = "<group>"; };
+		D0C180AA18E113CB003A5717 /* HYMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HYMessage.h; sourceTree = "<group>"; };
+		D0C180AB18E113CB003A5717 /* HYMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HYMessage.m; sourceTree = "<group>"; };
+		D0C180AF18E1588F003A5717 /* temMessage.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = temMessage.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +92,9 @@
 		D08CAEC718E05FFA00EE7193 = {
 			isa = PBXGroup;
 			children = (
+				D0C180AF18E1588F003A5717 /* temMessage.plist */,
+				D0C180A918E113B7003A5717 /* WeiChatMessage */,
+				D0C180A818E11394003A5717 /* WeiChatCell */,
 				D08CAF0218E0610100EE7193 /* MainChat */,
 				D08CAED918E05FFA00EE7193 /* WeiChat */,
 				D08CAEF218E05FFA00EE7193 /* WeiChatTests */,
@@ -160,6 +173,25 @@
 			name = MainChat;
 			sourceTree = "<group>";
 		};
+		D0C180A818E11394003A5717 /* WeiChatCell */ = {
+			isa = PBXGroup;
+			children = (
+				D0C180A318E1138D003A5717 /* HYMessageTableViewCell.h */,
+				D0C180A418E1138D003A5717 /* HYMessageTableViewCell.m */,
+				D0C180A518E1138D003A5717 /* HYMessageTableViewCell.xib */,
+			);
+			name = WeiChatCell;
+			sourceTree = "<group>";
+		};
+		D0C180A918E113B7003A5717 /* WeiChatMessage */ = {
+			isa = PBXGroup;
+			children = (
+				D0C180AA18E113CB003A5717 /* HYMessage.h */,
+				D0C180AB18E113CB003A5717 /* HYMessage.m */,
+			);
+			name = WeiChatMessage;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -236,9 +268,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0C180A718E1138D003A5717 /* HYMessageTableViewCell.xib in Resources */,
 				D08CAEDE18E05FFA00EE7193 /* InfoPlist.strings in Resources */,
 				D08CAF1818E067FA00EE7193 /* HYMainViewController.xib in Resources */,
 				D08CAEE618E05FFA00EE7193 /* Images.xcassets in Resources */,
+				D0C180B018E1588F003A5717 /* temMessage.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,7 +291,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0C180A618E1138D003A5717 /* HYMessageTableViewCell.m in Sources */,
 				D08CAEE018E05FFA00EE7193 /* main.m in Sources */,
+				D0C180AC18E113CB003A5717 /* HYMessage.m in Sources */,
 				D08CAEE418E05FFA00EE7193 /* HYAppDelegate.m in Sources */,
 				D08CAF1718E067FA00EE7193 /* HYMainViewController.m in Sources */,
 			);
@@ -456,6 +492,7 @@
 				D08CAEFE18E05FFA00EE7193 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D08CAEFF18E05FFA00EE7193 /* Build configuration list for PBXNativeTarget "WeiChatTests" */ = {
 			isa = XCConfigurationList;
@@ -464,6 +501,7 @@
 				D08CAF0118E05FFA00EE7193 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
