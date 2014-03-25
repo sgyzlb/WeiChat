@@ -6,9 +6,10 @@
 //  Copyright (c) 2014年 邱扬. All rights reserved.
 //
 
-#warning 需要添加接收消息recv
-
 #import "HYMainViewController.h"
+#import <sys/socket.h>
+#import <arpa/inet.h>
+#import <netinet/in.h>    //pf_inet
 
 @interface HYMainViewController ()
 
@@ -28,8 +29,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-#warning 测试用
-    _yn = YES;
     
     // Do any additional setup after loading the view from its nib.
     //table背景
@@ -55,6 +54,9 @@
         previousTime = message.time;
         
         [_allMainMessage addObject:messageFrame];
+        
+        //启用链接
+        [self startConnect];
     }
     
     
@@ -121,7 +123,7 @@
     _messageText.text = nil;
     
     
-#warning  需要添加网络send  发送消息
+    [self sendMessage:tempText];
     
     return YES;
 }
@@ -131,16 +133,8 @@
     HYMessage *addMessage = [[HYMessage alloc] init];
     addMessage.text = text;
     addMessage.time = time;
-#warning 测试用
-    if (_yn) {
-        addMessage.type = MessageForMe;
-        addMessage.icon = @"head1";
-        _yn = NO;
-    } else {
-        addMessage.type = MessageToMe;
-        addMessage.icon = @"head2";
-        _yn = YES;
-    }
+    addMessage.type = MessageForMe;
+    addMessage.icon = @"head1";
     addMainMessage.message = addMessage;
     
     [_allMainMessage addObject:addMainMessage];
@@ -206,6 +200,106 @@
     cell.mainMessage = _allMainMessage[indexPath.row];
     
     return cell;
+}
+
+#pragma mark 创建链接
+- (void)CreateConnect{
+    CFSocketContext sockContext = {0,   //结构体版本，必须0
+        (__bridge void *)(self),
+        NULL,   //一个定义在上面指针中的retain的回调，可以为null
+        NULL,
+        NULL};
+    
+    _socket = CFSocketCreate(kCFAllocatorDefault,      //为新对象分配内存，可以为nil
+                             PF_INET,                  //协议簇，如果为0或者负数，默认为PF_INET
+                             SOCK_STREAM,              //套接字类型，如果协议簇为PF_INET 塌毁默认为sock_stream
+                             IPPROTO_TCP,              //套接字协议，如果协议簇为PF_INET切协议为0或者负数，默认为IPPROTO_TCP
+                             kCFSocketConnectCallBack, //触发回调函数的socket消息类型，具体callback
+                             hyTcpClientCallBack,      //上 main情况下触发回调函数
+                             &sockContext);            //一个持有CFSocket结构信息的对象，可以为nil
+    if (_socket != NULL) {
+        struct sockaddr_in addr4;   //ipv4
+        memset(&addr4, 0, sizeof(addr4));
+        addr4.sin_len = sizeof(addr4);
+        addr4.sin_family = AF_INET;
+        addr4.sin_port = htons(8888);
+        addr4.sin_addr.s_addr = inet_addr("127.0.0.1");  //字符串地址转换为机器可以识别的网络地址
+        
+        //把sockaddr——in结构体中的地址转化为Data
+        CFDataRef address = CFDataCreate(kCFAllocatorDefault, (UInt8*)&addr4, sizeof(addr4));
+        CFSocketConnectToAddress(_socket, //连接的socket
+                                 address, //cfdataref类型的包含上面socket的远程地址的对象
+                                 -1);     //链接超时时间，为负数就不会尝试链接，而是把链接放在后台进行。如果socket消息类行为：kCFSocketConnectCallBack，将会在连接成功或失败的时候在后台触发回调函数
+        CFRunLoopRef cRunRef = CFRunLoopGetCurrent();  //获取当前县城的循环
+        
+        //创建一个循环，没有真正的加入到循环中，需要调用CFRunLoopAddSource
+        CFRunLoopSourceRef sourceRef = CFSocketCreateRunLoopSource(kCFAllocatorDefault, _socket, 0);
+        
+        CFRunLoopAddSource(cRunRef,                 //运行循环
+                           sourceRef,               //增加的运行循环源，他会被retain一次
+                           kCFRunLoopCommonModes);  //增加的运行循环源的模式
+        CFRelease(sourceRef);
+    }
+    
+}
+
+// socket回调函数，同客户端
+static void hyTcpClientCallBack(CFSocketRef socket, CFSocketCallBackType type, CFDataRef address, const void *data, void *info) {
+    HYMainViewController *hyMainVCClient = (__bridge HYMainViewController *)info;
+    if (data != NULL) {
+        NSLog(@"failure");
+    } else {
+        NSLog(@"ok");
+        
+        //读取接收的数据
+        [hyMainVCClient StartReadThread];
+    }
+}
+
+-(void)StartReadThread {
+    NSThread *initThread = [[NSThread alloc] initWithTarget:self selector:@selector(InitThreadFunc:) object:self];
+    [initThread start];
+}
+
+-(void)InitThreadFunc:(id)sender {
+    while (1) {
+        [self readStream];
+    }
+}
+
+//读取数据
+- (void)readStream {
+    char buffer[1024];
+    @autoreleasepool {
+        recv(CFSocketGetNative(_socket), buffer, sizeof(buffer), 0);
+        NSString *str = [NSString stringWithUTF8String:buffer];
+        [self performSelectorOnMainThread:@selector(addMsg:) withObject:str waitUntilDone:NO];
+    }
+}
+
+- (void)addMsg:(id)sender {
+    NSString *text = sender;
+    NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:text, @"text", @"10:00", @"time", @"head2", @"icon", @"1", @"type", nil];
+    HYMainMessage *messageFrame = [[HYMainMessage alloc] init];
+    HYMessage *message = [[HYMessage alloc] init];
+    message.dict = dict;
+    messageFrame.message = message;
+    [_allMainMessage addObject:messageFrame];
+    [self.mainTableView reloadData];
+    //滚动table
+    NSIndexPath *index = [NSIndexPath indexPathForRow:_allMainMessage.count - 1 inSection:0];
+    [self.mainTableView scrollToRowAtIndexPath:index atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+}
+
+//发送消息
+- (void)sendMessage:(NSString *)str {
+    const char* data = [str cStringUsingEncoding:NSASCIIStringEncoding];
+    send(CFSocketGetNative(_socket), data, strlen(data) + 1, 0);
+}
+
+//启动链接
+- (void)startConnect {
+    [self CreateConnect];
 }
 
 @end

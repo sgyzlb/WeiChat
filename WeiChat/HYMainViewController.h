@@ -10,7 +10,7 @@
 #import "HYMessageTableViewCell.h"
 
 @interface HYMainViewController : UIViewController<UITableViewDelegate, UITextFieldDelegate> {
-    BOOL _yn;
+    CFSocketRef _socket;
 }
 
 @property (nonatomic, strong) NSMutableArray *allMainMessage;
