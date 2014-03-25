@@ -28,6 +28,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+#warning 测试用
+    _yn = YES;
+    
     // Do any additional setup after loading the view from its nib.
     //table背景
     _mainTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -128,8 +131,16 @@
     HYMessage *addMessage = [[HYMessage alloc] init];
     addMessage.text = text;
     addMessage.time = time;
-    addMessage.type = MessageForMe;
-    addMessage.icon = @"head1";
+#warning 测试用
+    if (_yn) {
+        addMessage.type = MessageForMe;
+        addMessage.icon = @"head1";
+        _yn = NO;
+    } else {
+        addMessage.type = MessageToMe;
+        addMessage.icon = @"head2";
+        _yn = YES;
+    }
     addMainMessage.message = addMessage;
     
     [_allMainMessage addObject:addMainMessage];

@@ -9,7 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "HYMessageTableViewCell.h"
 
-@interface HYMainViewController : UIViewController<UITableViewDelegate, UITextFieldDelegate>
+@interface HYMainViewController : UIViewController<UITableViewDelegate, UITextFieldDelegate> {
+    BOOL _yn;
+}
 
 @property (nonatomic, strong) NSMutableArray *allMainMessage;
 
