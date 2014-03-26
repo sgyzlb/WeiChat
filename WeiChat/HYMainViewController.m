@@ -70,6 +70,9 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
+    //滚动table
+    NSIndexPath *index = [NSIndexPath indexPathForRow:_allMainMessage.count - 1 inSection:0];
+    [self.mainTableView scrollToRowAtIndexPath:index atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
 - (void)didReceiveMemoryWarning
@@ -229,7 +232,7 @@
         CFDataRef address = CFDataCreate(kCFAllocatorDefault, (UInt8*)&addr4, sizeof(addr4));
         CFSocketConnectToAddress(_socket, //连接的socket
                                  address, //cfdataref类型的包含上面socket的远程地址的对象
-                                 -1);     //链接超时时间，为负数就不会尝试链接，而是把链接放在后台进行。如果socket消息类行为：kCFSocketConnectCallBack，将会在连接成功或失败的时候在后台触发回调函数
+                                 1);     //链接超时时间，为负数就不会尝试链接，而是把链接放在后台进行。如果socket消息类行为：kCFSocketConnectCallBack，将会在连接成功或失败的时候在后台触发回调函数
         CFRunLoopRef cRunRef = CFRunLoopGetCurrent();  //获取当前县城的循环
         
         //创建一个循环，没有真正的加入到循环中，需要调用CFRunLoopAddSource
@@ -247,9 +250,9 @@
 static void hyTcpClientCallBack(CFSocketRef socket, CFSocketCallBackType type, CFDataRef address, const void *data, void *info) {
     HYMainViewController *hyMainVCClient = (__bridge HYMainViewController *)info;
     if (data != NULL) {
-        NSLog(@"failure");
+        NSLog(@"连接失败");
     } else {
-        NSLog(@"ok");
+        NSLog(@"连接成功");
         
         //读取接收的数据
         [hyMainVCClient StartReadThread];
@@ -293,8 +296,10 @@ static void hyTcpClientCallBack(CFSocketRef socket, CFSocketCallBackType type, C
 
 //发送消息
 - (void)sendMessage:(NSString *)str {
-    const char* data = [str cStringUsingEncoding:NSASCIIStringEncoding];
-    send(CFSocketGetNative(_socket), data, strlen(data) + 1, 0);
+    const char* data = [str UTF8String];
+    uint8_t *unit8 = (uint8_t*)data;
+    //const char* data = [str cStringUsingEncoding:NSASCIIStringEncoding];
+    send(CFSocketGetNative(_socket), unit8, strlen(data) + 1, 0);
 }
 
 //启动链接
