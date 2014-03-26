@@ -37,9 +37,11 @@
     _mainTableView.backgroundView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"bg"]];
     
 #warning //演示效果   初始化信息
-    NSArray *array = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"temMessage" ofType:@"plist"]];
+    //NSArray *array = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"temMessage" ofType:@"plist"]];
+    NSArray *array = [NSArray arrayWithContentsOfFile: @"/Users/peter/Desktop/WeiChat/temMessage.plist"];
     
     _allMainMessage = [NSMutableArray array];
+    _allMainMessageArray = [[NSMutableArray alloc ] init];
     NSString *previousTime = nil;
     for (NSDictionary *dict in array) {
         
@@ -54,12 +56,13 @@
         previousTime = message.time;
         
         [_allMainMessage addObject:messageFrame];
+        [_allMainMessageArray addObject:dict];
         
-        //启用链接
-        [self startConnect];
+        
     }
     
-    
+    //启用链接
+    [self startConnect];
     
     _messageText.delegate = self;
     //设置textField输入起始位置
@@ -71,14 +74,27 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
     //滚动table
-    NSIndexPath *index = [NSIndexPath indexPathForRow:_allMainMessage.count - 1 inSection:0];
-    [self.mainTableView scrollToRowAtIndexPath:index atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    if (_allMainMessage.count > 0) {
+        NSIndexPath *index = [NSIndexPath indexPathForRow:_allMainMessage.count - 1 inSection:0];
+        [self.mainTableView scrollToRowAtIndexPath:index atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    }
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+//视图即将被驳回时调用
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    //获取路径对象
+    //获取完整路径
+    NSString *plistPath = @"/Users/peter/Desktop/WeiChat/temMessage.plist";
+    //写入文件
+    [_allMainMessageArray writeToFile:plistPath atomically:YES];
 }
 
 #pragma mark - 键盘处理
@@ -125,6 +141,15 @@
     //将text清空
     _messageText.text = nil;
     
+    //定义第一个插件的属性
+    NSMutableDictionary *plugin1 = [[NSMutableDictionary alloc]init];
+    [plugin1 setObject:tempText forKey:@"text"];
+    [plugin1 setObject:tempTime forKey:@"time"];
+    [plugin1 setObject:@"head1" forKey:@"icon"];
+    [plugin1 setObject:[NSNumber numberWithInt:0] forKey:@"type"];
+    //设置属性值
+    [_allMainMessageArray addObject:plugin1];
+    
     
     [self sendMessage:tempText];
     
@@ -165,10 +190,6 @@
         //收回键盘
         [_messageText resignFirstResponder];
     }
-    
-    
-    
-#warning 这里添加语音接口  按住可以说话
     
 }
 
@@ -288,10 +309,14 @@ static void hyTcpClientCallBack(CFSocketRef socket, CFSocketCallBackType type, C
     message.dict = dict;
     messageFrame.message = message;
     [_allMainMessage addObject:messageFrame];
+    [_allMainMessageArray addObject:dict];
     [self.mainTableView reloadData];
     //滚动table
-    NSIndexPath *index = [NSIndexPath indexPathForRow:_allMainMessage.count - 1 inSection:0];
-    [self.mainTableView scrollToRowAtIndexPath:index atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    if (_allMainMessage.count > 0) {
+        NSIndexPath *index = [NSIndexPath indexPathForRow:_allMainMessage.count - 1 inSection:0];
+        [self.mainTableView scrollToRowAtIndexPath:index atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    }
+
 }
 
 //发送消息

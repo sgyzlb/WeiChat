@@ -14,6 +14,7 @@
 }
 
 @property (nonatomic, strong) NSMutableArray *allMainMessage;
+@property (nonatomic, strong) NSMutableArray *allMainMessageArray;
 
 @property (weak, nonatomic) IBOutlet UIButton *speakBtn;
 @property (weak, nonatomic) IBOutlet UITextField *messageText;
