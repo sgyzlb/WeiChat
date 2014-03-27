@@ -62,7 +62,7 @@
     }
     
     //启用链接
-    [self startConnect];
+    //[self startConnect];
     
     _messageText.delegate = self;
     //设置textField输入起始位置
@@ -72,6 +72,11 @@
     //设置通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(WillResignActive:)
+                                                 name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(BecomeActive:)
+                                                 name:UIApplicationDidBecomeActiveNotification object:nil];
     
     //滚动table
     if (_allMainMessage.count > 0) {
@@ -97,6 +102,17 @@
     [_allMainMessageArray writeToFile:plistPath atomically:YES];
 }
 
+- (void)WillResignActive:(NSNotification *)note {
+    //[self.view endEditing:YES];
+}
+
+- (void)BecomeActive:(NSNotification *)note {
+    [_messageText becomeFirstResponder];
+    //self.mainTableView.transform = CGAffineTransformMakeTranslation(0, -430);
+    //self.bottomView.transform = CGAffineTransformMakeTranslation(0, -430);;
+    //self.view.transform =  CGAffineTransformMakeTranslation(0, -430);
+}
+
 #pragma mark - 键盘处理
 #pragma mark 键盘即将显示
 - (void)keyBoardWillShow:(NSNotification *)note{
@@ -104,8 +120,10 @@
     CGRect rect = [note.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGFloat ty = - rect.size.height;
     [UIView animateWithDuration:[note.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue] animations:^{
-        self.view.transform = CGAffineTransformMakeTranslation(0, ty);
-        self.mainTableView.frame = CGRectMake(0, 0, 320, 520 - rect.size.height);
+        //self.view.transform = CGAffineTransformMakeTranslation(0, ty);
+        self.bottomView.transform = CGAffineTransformMakeTranslation(0, ty);
+        //self.mainTableView.transform = CGAffineTransformMakeTranslation(0, ty);
+        self.mainTableView.frame = CGRectMake(0, ty, 320, 520);
     }];
     
 }
@@ -113,7 +131,8 @@
 - (void)keyBoardWillHide:(NSNotification *)note{
     
     [UIView animateWithDuration:[note.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue] animations:^{
-        self.view.transform = CGAffineTransformIdentity;
+        //self.view.transform = CGAffineTransformIdentity;
+        self.bottomView.transform = CGAffineTransformIdentity;
         self.mainTableView.frame = CGRectMake(0, 0, 320, 520);
     }];
 }

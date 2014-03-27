@@ -8,6 +8,7 @@
 
 #import "HYAppDelegate.h"
 #import "HYMainViewController.h"
+#import "HYViewController.h"
 
 @implementation HYAppDelegate
 
@@ -15,8 +16,11 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
-    HYMainViewController *mainVC = [[HYMainViewController alloc] init];
-    [self.window setRootViewController:mainVC];
+    HYViewController *hyvc = [[HYViewController alloc] init];
+    UINavigationController *nv = [[UINavigationController alloc] initWithRootViewController:hyvc];
+    [self.window setRootViewController:nv];
+//    HYMainViewController *mainVC = [[HYMainViewController alloc] init];
+//    [self.window setRootViewController:mainVC];
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     return YES;
