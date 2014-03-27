@@ -120,6 +120,8 @@
     CGRect rect = [note.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGFloat ty = - rect.size.height;
     [UIView animateWithDuration:[note.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue] animations:^{
+        //如果修改主view，那么home返回后会回弹。  此时只需要修改两个子view就可以解决问题，但是坐标数据难设置。
+        //不修改主view坐标，就需要修改两个子view。  但是是自动获得数据。
         //self.view.transform = CGAffineTransformMakeTranslation(0, ty);
         self.bottomView.transform = CGAffineTransformMakeTranslation(0, ty);
         //self.mainTableView.transform = CGAffineTransformMakeTranslation(0, ty);
